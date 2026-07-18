@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
     <!-- Ambient Background Glows -->
@@ -45,29 +45,28 @@
         <!-- Section 2: 함께 응원해요! -->
         <section class="community-section">
             <h2 class="section-title">함께 응원해요!</h2>
-            <div class="message-feed">
-                <!-- Message 1 -->
-                <div class="feed-item">
-                    <img src="avatar1.png" alt="인자한 교장선생님" class="feed-avatar">
-                    <div class="feed-content">
-                        <div class="feed-header">
-                            <span class="feed-username">인자한 교장선생님</span>
-                            <span class="feed-time">방금 전</span>
-                        </div>
-                        <p class="feed-message">각자의 자리에서 묵묵히 교육의 참뜻을 실천하고 계시는 우리 선생님들과 모든 교직원 여러분, 당신들의 선한 헌신이 있기에 우리 아이들과 세상이 더욱 따뜻하게 빛납니다. 진심으로 감사하고 응원합니다.</p>
-                    </div>
+            
+            <!-- Message Write Form -->
+            <div class="write-box">
+                <h3 class="write-box-title">따뜻한 한마디 더하기</h3>
+                <div class="write-inputs">
+                    <input type="text" id="writer-name" placeholder="닉네임 또는 이름 (예: 은하수)" maxlength="15">
+                    <select id="writer-role">
+                        <option value="teacher">선생님</option>
+                        <option value="vicemaster">교감선생님</option>
+                        <option value="master">교장선생님</option>
+                        <option value="parent">학부모</option>
+                        <option value="student">학생</option>
+                        <option value="citizen">응원하는 시민</option>
+                    </select>
                 </div>
-                <!-- Message 2 -->
-                <div class="feed-item">
-                    <img src="avatar2.png" alt="열정 가득한 교감선생님" class="feed-avatar">
-                    <div class="feed-content">
-                        <div class="feed-header">
-                            <span class="feed-username">열정 가득한 교감선생님</span>
-                            <span class="feed-time">5분 전</span>
-                        </div>
-                        <p class="feed-message">보이지 않는 곳에서도 온 마음을 다해 하루를 지켜내시는 모든 교육 가족분들, 지치는 순간 속에서도 웃음을 잃지 않고 헌신하시는 여러분의 매 순간이 곧 기적입니다. 오늘 하루도 고생 많으셨습니다!</p>
-                    </div>
-                </div>
+                <textarea id="writer-message" placeholder="여기에 모두를 향한 응원의 한마디를 남겨주세요..." maxlength="150"></textarea>
+                <button class="save-btn" onclick="saveMessage(event)">응원 저장하기</button>
+            </div>
+
+            <!-- Message Feed Container -->
+            <div class="message-feed" id="message-feed-container">
+                <!-- Dynamically loaded via JavaScript -->
             </div>
         </section>
     </main>
@@ -542,6 +541,146 @@
                 toast.classList.remove('show');
             }, 2500);
         }
+
+        // List of default/static community messages
+        const defaultMessages = [
+            {
+                username: '인자한 교장선생님',
+                avatar: 'avatar1.png',
+                time: '방금 전',
+                message: '각자의 자리에서 묵묵히 교육의 참뜻을 실천하고 계시는 우리 선생님들과 모든 교직원 여러분, 당신들의 선한 헌신이 있기에 우리 아이들과 세상이 더욱 따뜻하게 빛납니다. 진심으로 감사하고 응원합니다.'
+            },
+            {
+                username: '열정 가득한 교감선생님',
+                avatar: 'avatar2.png',
+                time: '5분 전',
+                message: '보이지 않는 곳에서도 온 마음을 다해 하루를 지켜내시는 모든 교육 가족분들, 지치는 순간 속에서도 웃음을 잃지 않고 헌신하시는 여러분의 매 순간이 곧 기적입니다. 오늘 하루도 고생 많으셨습니다!'
+            }
+        ];
+
+        // Load community messages from localStorage or use defaults
+        let customMessages = [];
+        try {
+            const saved = localStorage.getItem('cheer_community_messages');
+            if (saved) {
+                customMessages = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error("Failed to load local storage messages: ", e);
+        }
+
+        // Render feed function
+        function renderFeed() {
+            const feedContainer = document.getElementById('message-feed-container');
+            if (!feedContainer) return;
+            
+            feedContainer.innerHTML = '';
+            
+            // Render user saved custom messages first, then defaults
+            const allMessages = [...customMessages, ...defaultMessages];
+            
+            allMessages.forEach(item => {
+                const feedItem = document.createElement('div');
+                feedItem.classList.add('feed-item');
+                
+                // Add fade-in entry animation for new items
+                feedItem.style.animation = 'fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                
+                feedItem.innerHTML = `
+                    <img src="${item.avatar}" alt="${item.username}" class="feed-avatar">
+                    <div class="feed-content">
+                        <div class="feed-header">
+                            <span class="feed-username">${item.username}</span>
+                            <span class="feed-time">${item.time}</span>
+                        </div>
+                        <p class="feed-message">${item.message}</p>
+                    </div>
+                `;
+                feedContainer.appendChild(feedItem);
+            });
+        }
+
+        // Save new message function
+        function saveMessage(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Play keycap click sound
+            playClickSound();
+            
+            const nameInput = document.getElementById('writer-name');
+            const roleSelect = document.getElementById('writer-role');
+            const messageInput = document.getElementById('writer-message');
+            
+            const name = nameInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            if (!name) {
+                showToast('닉네임 또는 이름을 입력해 주세요!');
+                nameInput.focus();
+                return;
+            }
+            if (!message) {
+                showToast('응원 메시지 내용을 입력해 주세요!');
+                messageInput.focus();
+                return;
+            }
+            
+            // Determine avatar based on role
+            const role = roleSelect.value;
+            let avatar = 'avatar2.png'; // default
+            if (['teacher', 'vicemaster', 'master'].includes(role)) {
+                avatar = 'avatar1.png';
+            }
+            
+            // Create role display name
+            const roleLabels = {
+                teacher: '선생님',
+                vicemaster: '교감선생님',
+                master: '교장선생님',
+                parent: '학부모',
+                student: '학생',
+                citizen: '응원하는 시민'
+            };
+            const roleLabel = roleLabels[role] || '선생님';
+            const displayName = `${name} (${roleLabel})`;
+            
+            const newMessage = {
+                username: displayName,
+                avatar: avatar,
+                time: '방금 전',
+                message: message
+            };
+            
+            // Insert at the beginning of custom messages
+            customMessages.unshift(newMessage);
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('cheer_community_messages', JSON.stringify(customMessages));
+            } catch (e) {
+                console.error("Failed to save message to localStorage: ", e);
+            }
+            
+            // Clear inputs
+            messageInput.value = '';
+            nameInput.value = '';
+            
+            // Rerender feed
+            renderFeed();
+            
+            // Show success toast
+            showToast('따뜻한 응원이 저장되었습니다!');
+            
+            // Add subtle particle effect around the save button
+            const rect = event.target.getBoundingClientRect();
+            createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+
+        // Initialize feed on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFeed();
+        });
     </script>
 </body>
 </html>

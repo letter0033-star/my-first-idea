@@ -489,3 +489,103 @@ body {
     color: var(--text-secondary);
     margin: 0;
 }
+
+/* Write Form Styles */
+.write-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.02);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.write-box-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    font-family: var(--font-korean);
+}
+
+.write-inputs {
+    display: flex;
+    gap: 12px;
+}
+
+.write-inputs input, .write-inputs select, .write-box textarea {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font-korean);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.write-inputs input {
+    flex: 1;
+}
+
+.write-inputs select {
+    width: 130px;
+    cursor: pointer;
+}
+
+.write-box textarea {
+    width: 100%;
+    height: 80px;
+    resize: none;
+}
+
+.write-inputs input:focus, .write-inputs select:focus, .write-box textarea:focus {
+    border-color: rgba(255, 126, 71, 0.5);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 3px rgba(255, 126, 71, 0.15);
+}
+
+.save-btn {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #ff7e47 0%, #e05e26 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 126, 71, 0.2);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--font-korean);
+    outline: none;
+}
+
+.save-btn:hover {
+    background: linear-gradient(135deg, #42342c 0%, #2e2520 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile Adjustments for Write Box */
+@media (max-width: 480px) {
+    .write-inputs {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .write-inputs select {
+        width: 100%;
+    }
+}
