@@ -9,12 +9,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
     <!-- Ambient Background Glows -->
     <div class="glow-1" aria-hidden="true"></div>
     <div class="glow-2" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <p>지친 하루, 마음을 다독여줄 한마디를 만나보세요</p>
+    </header>
 
     <!-- Main Container -->
     <main>
@@ -28,6 +33,20 @@
             <button id="cheer-btn" class="action-btn" onclick="triggerCheer(event)">한 번 더 힘내기</button>
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <button class="share-btn" onclick="shareLink(event)">
+            <svg class="share-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            공유하기
+        </button>
+    </footer>
 
     <!-- Interactive Script -->
     <script>
@@ -446,6 +465,44 @@
                     particle.remove();
                 };
             }
+        }
+
+        function shareLink(event) {
+            event.stopPropagation();
+            const shareData = {
+                title: '오늘도 힘내세요!',
+                text: '지친 하루, 마음을 다독여줄 한마디를 만나보세요.',
+                url: window.location.origin + window.location.pathname
+            };
+            
+            if (navigator.share) {
+                navigator.share(shareData)
+                    .catch((err) => console.log('Share failed', err));
+            } else {
+                // Fallback: Copy to clipboard
+                const shareUrl = window.location.origin + window.location.pathname;
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => {
+                        showToast('링크가 복사되었습니다!');
+                    })
+                    .catch((err) => {
+                        console.error('Could not copy text: ', err);
+                    });
+            }
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
         }
     </script>
 </body>
