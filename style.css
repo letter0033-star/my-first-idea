@@ -625,73 +625,7 @@ body {
     transform: scale(0.92);
 }
 
-/* Avatar Selector Styles */
-.avatar-selector-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 4px;
-}
-
-.avatar-selector-label {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    opacity: 0.8;
-    font-family: var(--font-korean);
-}
-
-.avatar-selector-grid {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 6px 2px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 126, 71, 0.3) transparent;
-}
-
-/* Custom Scrollbar for Avatar Grid on WebKit */
-.avatar-selector-grid::-webkit-scrollbar {
-    height: 4px;
-}
-
-.avatar-selector-grid::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 126, 71, 0.3);
-    border-radius: 4px;
-}
-
-.avatar-option {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2.5px solid transparent;
-    cursor: pointer;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    flex-shrink: 0;
-}
-
-.avatar-option img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.25s ease;
-}
-
-.avatar-option:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(255, 126, 71, 0.15);
-    border-color: rgba(255, 126, 71, 0.4);
-}
-
-.avatar-option.active {
-    border-color: #ff7e47;
-    box-shadow: 0 0 0 3px rgba(255, 126, 71, 0.2), 0 4px 12px rgba(255, 126, 71, 0.25);
-    transform: scale(1.06);
-}
-
-.avatar-option.active img {
-    transform: scale(1.08);
+/* Avatar Selector Dropdown Style */
+#writer-avatar {
+    width: 160px;
 }

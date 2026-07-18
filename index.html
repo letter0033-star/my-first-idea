@@ -59,41 +59,19 @@
                         <option value="student">학생</option>
                         <option value="citizen">응원하는 시민</option>
                     </select>
+                    <select id="writer-avatar" onchange="playClickSound()">
+                        <option value="avatar_20m.png">👦 20대 남성 캐릭터</option>
+                        <option value="avatar_20f.png">👧 20대 여성 캐릭터</option>
+                        <option value="avatar_30m.png">👨 30대 남성 캐릭터</option>
+                        <option value="avatar_30f.png">👩 30대 여성 캐릭터</option>
+                        <option value="avatar_40m.png">👓 40대 남성 캐릭터</option>
+                        <option value="avatar_40f.png">👩‍🦰 40대 여성 캐릭터</option>
+                        <option value="avatar_50m.png">👴 50대 남성 캐릭터</option>
+                        <option value="avatar_50f.png">👵 50대 여성 캐릭터</option>
+                    </select>
                 </div>
                 
-                <!-- Character Avatar Selector -->
-                <div class="avatar-selector-container">
-                    <label class="avatar-selector-label">나를 표현할 캐릭터 선택</label>
-                    <div class="avatar-selector-grid">
-                        <div class="avatar-option active" onclick="selectAvatarOption(this, 'avatar_20m.png')">
-                            <img src="avatar_20m.png" alt="20대 남성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_20f.png')">
-                            <img src="avatar_20f.png" alt="20대 여성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_30m.png')">
-                            <img src="avatar_30m.png" alt="30대 남성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_30f.png')">
-                            <img src="avatar_30f.png" alt="30대 여성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_40m.png')">
-                            <img src="avatar_40m.png" alt="40대 남성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_40f.png')">
-                            <img src="avatar_40f.png" alt="40대 여성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_50m.png')">
-                            <img src="avatar_50m.png" alt="50대 남성">
-                        </div>
-                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_50f.png')">
-                            <img src="avatar_50f.png" alt="50대 여성">
-                        </div>
-                    </div>
-                    <input type="hidden" id="selected-avatar-input" value="avatar_20m.png">
-                </div>
-                
-                <textarea id="writer-message" placeholder="여기에 모두를 향한 응원의 한마디를 남겨주세요..." maxlength="150"></textarea>
+                <textarea id="writer-message" placeholder="여기에 모두를 향한 응원의 한마디를 남겨주세요..." maxlength="150" style="margin-top: 12px;"></textarea>
                 <button class="save-btn" onclick="saveMessage(event)">응원 저장하기</button>
             </div>
 
@@ -761,8 +739,8 @@
                 return;
             }
             
-            // Get selected avatar from selector input
-            const avatar = document.getElementById('selected-avatar-input').value;
+            // Get selected avatar from selector dropdown
+            const avatar = document.getElementById('writer-avatar').value;
             const role = roleSelect.value;
             
             // Create role display name
