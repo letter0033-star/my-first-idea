@@ -114,7 +114,37 @@
             "지쳤다는 건, 최선을 다했다는 뜻이죠.",
             "조금 쉬어도, 당신은 여전히 좋은 선생님이에요.",
             "오늘도 누군가의 하루를 밝혔어요.",
-            "애쓴 당신에게, 박수를 보냅니다."
+            "애쓴 당신에게, 박수를 보냅니다.",
+            "오늘 하루, 참 수고 많았어요.",
+            "당신의 인내심에 경의를 표해요.",
+            "지치는 게 당연한 하루였어요.",
+            "오늘도 묵묵히 해냈네요.",
+            "힘들었던 만큼, 값진 하루였어요.",
+            "당신의 노력, 결코 작지 않아요.",
+            "아이들 곁에서, 오늘도 최선을 다했죠.",
+            "그 진심, 다 전해졌을 거예요.",
+            "하루의 무게, 잘 견뎌냈어요.",
+            "당신이 있어 오늘도 든든했어요.",
+            "작은 기적들을 만든 하루였어요.",
+            "오늘의 피곤함, 자랑스러워해도 돼요.",
+            "당신의 정성이 아이들의 내일을 만들어요.",
+            "오늘도 한 걸음, 잘 걸었어요.",
+            "힘든 순간에도 미소를 잃지 않았죠.",
+            "당신 덕분에 오늘이 따뜻했어요.",
+            "지친 몸, 자랑스러운 훈장이에요.",
+            "오늘 하루도 온 마음을 다했네요.",
+            "당신의 하루는 결코 평범하지 않아요.",
+            "참 든든한 하루를 만들어줬어요.",
+            "오늘의 인내, 내일의 힘이 될 거예요.",
+            "지쳐도 웃어준 당신, 참 대단해요.",
+            "오늘 하루, 진심으로 애썼어요.",
+            "당신의 정성이 헛되지 않을 거예요.",
+            "작은 순간들이 모여 큰 사랑이 됐어요.",
+            "오늘도 아이들에게 최고의 어른이었어요.",
+            "힘냈던 오늘, 잘 마무리했어요.",
+            "당신의 하루가 참 값졌어요.",
+            "지친 몸도, 따뜻한 마음도 다 안아줄게요.",
+            "오늘 하루, 정말 고생 많았어요."
         ];
 
         let lastIndex = 0; // Starts with "오늘도 힘내세요!" (index 0)
@@ -134,8 +164,8 @@
         if (window.location.search.includes('test=true')) {
             window.addEventListener('DOMContentLoaded', () => {
                 const heading = document.getElementById('main-heading');
-                // Use index 47 to verify new sentence rendering
-                heading.textContent = sentences[47];
+                // Use index 62 to verify text rendering
+                heading.textContent = sentences[62];
                 
                 // Force select Teal (index 1) in test mode to verify button color updates properly
                 const btn = document.getElementById('cheer-btn');
