@@ -85,6 +85,17 @@
         </button>
     </footer>
 
+    <!-- Debug Console Log Bar for Troubleshooting -->
+    <div id="debug-panel" style="position: fixed; bottom: 10px; left: 10px; z-index: 10000; background: rgba(30, 25, 22, 0.95); border: 1px solid rgba(255, 126, 71, 0.3); border-radius: 12px; padding: 12px; max-width: 90%; width: 350px; font-family: monospace; font-size: 11px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 126, 71, 0.2); padding-bottom: 6px; margin-bottom: 6px; font-weight: bold; color: #ff7e47;">
+            <span>🔧 실시간 DB 디버그 패널</span>
+            <button onclick="document.getElementById('debug-logs').style.display = document.getElementById('debug-logs').style.display === 'none' ? 'block' : 'none'" style="background: none; border: none; color: #ff7e47; cursor: pointer; font-size: 11px; padding: 0 4px;">접기/펴기</button>
+        </div>
+        <div id="debug-logs" style="max-height: 120px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4;">
+            프로젝트 연결 시도 중...<br>
+        </div>
+    </div>
+
     <!-- Interactive Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -563,32 +574,64 @@
         // Live messages from Firebase
         let firebaseMessages = [];
 
+        // Debug logger helper
+        function logDebug(msg, isError = false) {
+            console.log(msg);
+            const logsDiv = document.getElementById('debug-logs');
+            if (logsDiv) {
+                const color = isError ? '#ff4d4d' : '#00ffcc';
+                logsDiv.innerHTML += `<span style="color: ${color};">[${new Date().toLocaleTimeString()}]</span> ${msg}<br>`;
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        }
+
         // Dynamic Firebase Realtime Database auto-probing
         async function initFirebaseDb() {
-            // Import SDK function dynamically
-            const { getDatabase, ref, push, onValue } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
-            
-            const usUrl = "https://my-first-idea-23d72-default-rtdb.firebaseio.com";
-            const sgUrl = "https://my-first-idea-23d72-default-rtdb.asia-southeast1.firebasedatabase.app";
-            
-            let selectedUrl = usUrl;
-            
+            logDebug("Firebase DB 연동 작업 시작...");
             try {
-                // Probe Singapore database URL (shallow check)
-                const res = await fetch(sgUrl + "/.json?shallow=true", { method: 'GET' });
-                // If the fetch completes successfully (even if it returns 401/403/200), the URL is active!
-                selectedUrl = sgUrl;
-                console.log("Auto-detected Singapore database region!");
-            } catch(e) {
-                console.log("Singapore region probe failed, fallback to US database URL.");
-            }
-            
-            try {
+                // Import SDK function dynamically
+                const { getDatabase, ref, push, onValue } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
+                
+                const usUrl = "https://my-first-idea-23d72-default-rtdb.firebaseio.com";
+                const sgUrl = "https://my-first-idea-23d72-default-rtdb.asia-southeast1.firebasedatabase.app";
+                
+                let selectedUrl = usUrl;
+                logDebug("리전별 데이터베이스 존재 여부 분석 중...");
+                
+                try {
+                    const resSg = await fetch(sgUrl + "/.json?shallow=true", { method: 'GET' });
+                    const resUs = await fetch(usUrl + "/.json?shallow=true", { method: 'GET' });
+                    
+                    logDebug(`SG 응답 코드: ${resSg.status}, US 응답 코드: ${resUs.status}`);
+                    
+                    // Since fetch does not throw for 404, we check status. Active DB will return 200 (ok) or 401/403 (rules active)
+                    const isActive = (status) => status === 200 || status === 401 || status === 403;
+                    
+                    if (isActive(resSg.status)) {
+                        selectedUrl = sgUrl;
+                        logDebug("싱가포르(asia-southeast1) 데이터베이스가 활성화되어 있습니다!");
+                    } else if (isActive(resUs.status)) {
+                        selectedUrl = usUrl;
+                        logDebug("미국(firebaseio.com) 데이터베이스가 활성화되어 있습니다!");
+                    } else {
+                        logDebug("활성화된 리전을 식별할 수 없습니다. 싱가포르 리전을 기본값으로 사용해 연결을 시도합니다.");
+                        selectedUrl = sgUrl;
+                    }
+                } catch(e) {
+                    logDebug("네트워크 검사 실패 (CORS/차단): " + e.message, true);
+                    logDebug("안전한 연결을 위해 싱가포르 리전을 기본값으로 설정합니다.");
+                    selectedUrl = sgUrl;
+                }
+                
+                logDebug("접속 대상 URL: " + selectedUrl);
                 db = getDatabase(app, selectedUrl);
                 messagesRef = ref(db, 'messages');
                 
+                logDebug("데이터베이스 리스너 가동 중...");
+                
                 // Real-time synchronization
                 onValue(messagesRef, (snapshot) => {
+                    logDebug("실시간 데이터베이스로부터 데이터를 성공적으로 수신했습니다!");
                     const data = snapshot.val();
                     const loaded = [];
                     if (data) {
@@ -602,10 +645,12 @@
                     renderFeed();
                 }, (error) => {
                     console.error("Firebase Database read failed: ", error);
+                    logDebug("데이터베이스 읽기 권한 실패: " + error.message, true);
                     showToast('데이터베이스 권한 규칙(Rules)을 확인해 주세요.');
                 });
             } catch (err) {
                 console.error("Firebase DB init failed: ", err);
+                logDebug("파이어베이스 초기화 치명적 에러: " + err.message, true);
             }
         }
 
@@ -709,9 +754,11 @@
                     })
                     .catch((err) => {
                         console.error("Firebase push failed: ", err);
+                        logDebug("데이터 전송 실패: " + err.message, true);
                         showToast('등록에 실패했습니다. DB 규칙(Rules)을 확인해 주세요.');
                     });
             } else {
+                logDebug("연결 실패: messagesRef가 정의되지 않았습니다.", true);
                 showToast('데이터베이스에 연결하는 중입니다. 잠시 후 다시 시도해 주세요.');
             }
         }
