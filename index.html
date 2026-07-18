@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
     <!-- Ambient Background Glows -->
@@ -284,13 +284,13 @@
         }
 
         const buttonGradients = [
-            { base: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)", hover: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)" }, // Blue
-            { base: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)", hover: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)" }, // Teal
-            { base: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)", hover: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)" }, // Indigo
-            { base: "linear-gradient(135deg, #db2777 0%, #9d174d 100%)", hover: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)" }, // Pink
-            { base: "linear-gradient(135deg, #0284c7 0%, #075985 100%)", hover: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)" }, // Sky
-            { base: "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)", hover: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)" }, // Orange
-            { base: "linear-gradient(135deg, #16a34a 0%, #166534 100%)", hover: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }  // Green
+            { base: "linear-gradient(135deg, #ff7e47 0%, #e05e26 100%)", hover: "linear-gradient(135deg, #42342c 0%, #2e2520 100%)" }, // Orange to Dark Charcoal
+            { base: "linear-gradient(135deg, #ff9233 0%, #ea580c 100%)", hover: "linear-gradient(135deg, #372b25 0%, #211915 100%)" }, // Bright Orange to Deep Charcoal
+            { base: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", hover: "linear-gradient(135deg, #451a03 0%, #30241e 100%)" }, // Soft Amber to Sienna
+            { base: "linear-gradient(135deg, #f43f5e 0%, #be123c 100%)", hover: "linear-gradient(135deg, #3f0b18 0%, #27050e 100%)" }, // Rose to Dark Magenta
+            { base: "linear-gradient(135deg, #ffa07a 0%, #e2583e 100%)", hover: "linear-gradient(135deg, #4a3429 0%, #2f2019 100%)" }, // Salmon to Chestnut
+            { base: "linear-gradient(135deg, #f5b041 0%, #ca6f1e 100%)", hover: "linear-gradient(135deg, #3e2723 0%, #271714 100%)" }, // Gold to Bronze
+            { base: "linear-gradient(135deg, #ff8c00 0%, #cd5c5c 100%)", hover: "linear-gradient(135deg, #3d2f2f 0%, #271c1c 100%)" }  // Dark Orange to Terracotta
         ];
         let lastColorIndex = 0;
 
@@ -433,7 +433,7 @@
         }
 
         function createParticles(x, y) {
-            const colors = ['#60a5fa', '#3b82f6', '#0ea5e9', '#06b6d4', '#ffd700'];
+            const colors = ['#ff7e47', '#ffa072', '#ffedd5', '#2e2520', '#ffd700'];
             for (let i = 0; i < 15; i++) {
                 const particle = document.createElement('div');
                 particle.style.position = 'fixed';
