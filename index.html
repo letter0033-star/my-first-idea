@@ -88,7 +88,7 @@
     <!-- Interactive Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -623,7 +623,10 @@
                     const loaded = [];
                     if (data) {
                         Object.keys(data).forEach(key => {
-                            loaded.push(data[key]);
+                            loaded.push({
+                                id: key,
+                                ...data[key]
+                            });
                         });
                         // Sort by timestamp descending (newest first)
                         loaded.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -639,6 +642,17 @@
                 console.error("Firebase DB init failed: ", err);
                 logDebug("파이어베이스 초기화 치명적 에러: " + err.message, true);
             }
+        }
+
+        // Retrieve keys of messages created by the user from localStorage
+        let myCreatedKeys = [];
+        try {
+            const savedKeys = localStorage.getItem('my_created_cheer_keys');
+            if (savedKeys) {
+                myCreatedKeys = JSON.parse(savedKeys);
+            }
+        } catch (e) {
+            console.error("Failed to load my_created_cheer_keys: ", e);
         }
 
         // Render feed function
@@ -658,12 +672,28 @@
                 
                 const timeText = formatRelativeTime(item.timestamp);
                 
+                // Show delete button only if it's a custom Firebase message created by this user
+                const isMyMessage = item.id && myCreatedKeys.includes(item.id);
+                const deleteBtnHtml = isMyMessage 
+                    ? `<button class="delete-msg-btn" onclick="deleteMessage(event, '${item.id}')" title="삭제하기">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                       </button>` 
+                    : '';
+                
                 feedItem.innerHTML = `
                     <img src="${item.avatar}" alt="${item.username}" class="feed-avatar">
                     <div class="feed-content">
                         <div class="feed-header">
                             <span class="feed-username">${item.username}</span>
-                            <span class="feed-time">${timeText}</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="feed-time">${timeText}</span>
+                                ${deleteBtnHtml}
+                            </div>
                         </div>
                         <p class="feed-message">${item.message}</p>
                     </div>
@@ -726,27 +756,66 @@
             
             if (messagesRef) {
                 const { push } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
-                push(messagesRef, newMessage)
-                    .then(() => {
-                        // Clear inputs
-                        messageInput.value = '';
-                        nameInput.value = '';
-                        
-                        // Show success toast
-                        showToast('따뜻한 응원이 등록되었습니다!');
-                        
-                        // Add subtle particle effect around the save button
-                        const rect = event.target.getBoundingClientRect();
-                        createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
-                    })
-                    .catch((err) => {
-                        console.error("Firebase push failed: ", err);
-                        logDebug("데이터 전송 실패: " + err.message, true);
-                        showToast('등록에 실패했습니다. DB 규칙(Rules)을 확인해 주세요.');
-                    });
+                const newMsgRef = push(messagesRef, newMessage);
+                const newKey = newMsgRef.key;
+                
+                newMsgRef.then(() => {
+                    // Save key to local storage
+                    myCreatedKeys.push(newKey);
+                    try {
+                        localStorage.setItem('my_created_cheer_keys', JSON.stringify(myCreatedKeys));
+                    } catch(e) {
+                        console.error(e);
+                    }
+                    
+                    // Clear inputs
+                    messageInput.value = '';
+                    nameInput.value = '';
+                    
+                    // Show success toast
+                    showToast('따뜻한 응원이 등록되었습니다!');
+                    
+                    // Add subtle particle effect around the save button
+                    const rect = event.target.getBoundingClientRect();
+                    createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                })
+                .catch((err) => {
+                    console.error("Firebase push failed: ", err);
+                    logDebug("데이터 전송 실패: " + err.message, true);
+                    showToast('등록에 실패했습니다. DB 규칙(Rules)을 확인해 주세요.');
+                });
             } else {
                 logDebug("연결 실패: messagesRef가 정의되지 않았습니다.", true);
                 showToast('데이터베이스에 연결하는 중입니다. 잠시 후 다시 시도해 주세요.');
+            }
+        }
+
+        // Delete message function
+        async function deleteMessage(event, id) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Play mechanical key click sound
+            playClickSound();
+            
+            if (confirm('이 응원 메시지를 삭제하시겠습니까?')) {
+                const msgRef = ref(db, `messages/${id}`);
+                
+                remove(msgRef)
+                    .then(() => {
+                        showToast('메시지가 성공적으로 삭제되었습니다.');
+                        // Remove from local list to be clean
+                        myCreatedKeys = myCreatedKeys.filter(k => k !== id);
+                        try {
+                            localStorage.setItem('my_created_cheer_keys', JSON.stringify(myCreatedKeys));
+                        } catch(e) {
+                            console.error(e);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Delete failed: ", err);
+                        showToast('삭제 권한이 없거나 오류가 발생했습니다.');
+                    });
             }
         }
 
@@ -760,6 +829,7 @@
         window.createRipple = createRipple;
         window.triggerCheer = triggerCheer;
         window.saveMessage = saveMessage;
+        window.deleteMessage = deleteMessage;
         window.shareLink = shareLink;
     </script>
 </body>

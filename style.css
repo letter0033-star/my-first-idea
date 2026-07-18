@@ -597,3 +597,30 @@ body {
         width: 100%;
     }
 }
+
+/* Delete Message Button Styles */
+.delete-msg-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    opacity: 0.35;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+}
+
+.delete-msg-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    opacity: 1;
+    transform: scale(1.08);
+}
+
+.delete-msg-btn:active {
+    transform: scale(0.92);
+}
