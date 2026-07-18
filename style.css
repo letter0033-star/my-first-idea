@@ -195,3 +195,35 @@ main {
         opacity: 0;
     }
 }
+
+/* Button styling */
+.action-btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--font-korean);
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2), 0 2px 4px rgba(37, 99, 235, 0.1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    outline: none;
+    position: relative;
+    z-index: 20;
+    overflow: hidden;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35), 0 4px 6px rgba(37, 99, 235, 0.15);
+}
+
+.action-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}

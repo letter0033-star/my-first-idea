@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <!-- Ambient Background Glows -->
@@ -25,6 +25,7 @@
                 <h1 id="main-heading">오늘도 힘내세요!</h1>
             </div>
             <p id="sub-text">클릭하여 아이디어의 시작을 기념하세요 ✨</p>
+            <button id="cheer-btn" class="action-btn" onclick="triggerCheer(event)">한 번 더 힘내기</button>
         </div>
     </main>
 
@@ -61,6 +62,24 @@
 
             // Generate floating particle effects
             createParticles(event.clientX, event.clientY);
+        }
+
+        function triggerCheer(event) {
+            event.stopPropagation(); // Prevent event bubbling to card
+            
+            const btn = document.getElementById('cheer-btn');
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 100);
+            
+            const rect = btn.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            // Double burst for extra celebratory effect
+            createParticles(x, y);
+            setTimeout(() => createParticles(x, y), 80);
         }
 
         function createParticles(x, y) {
