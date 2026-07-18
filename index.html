@@ -759,21 +759,24 @@
                 const newMsgRef = push(messagesRef, newMessage);
                 const newKey = newMsgRef.key;
                 
+                // Optimistically save the key to localStorage before push completes
+                myCreatedKeys.push(newKey);
+                try {
+                    localStorage.setItem('my_created_cheer_keys', JSON.stringify(myCreatedKeys));
+                } catch(e) {
+                    console.error("Failed to optimistically save key: ", e);
+                }
+                
                 newMsgRef.then(() => {
-                    // Save key to local storage
-                    myCreatedKeys.push(newKey);
-                    try {
-                        localStorage.setItem('my_created_cheer_keys', JSON.stringify(myCreatedKeys));
-                    } catch(e) {
-                        console.error(e);
-                    }
-                    
                     // Clear inputs
                     messageInput.value = '';
                     nameInput.value = '';
                     
                     // Show success toast
                     showToast('따뜻한 응원이 등록되었습니다!');
+                    
+                    // Force render update immediately
+                    renderFeed();
                     
                     // Add subtle particle effect around the save button
                     const rect = event.target.getBoundingClientRect();
@@ -783,6 +786,15 @@
                     console.error("Firebase push failed: ", err);
                     logDebug("데이터 전송 실패: " + err.message, true);
                     showToast('등록에 실패했습니다. DB 규칙(Rules)을 확인해 주세요.');
+                    
+                    // Rollback optimistic key save if failed
+                    myCreatedKeys = myCreatedKeys.filter(k => k !== newKey);
+                    try {
+                        localStorage.setItem('my_created_cheer_keys', JSON.stringify(myCreatedKeys));
+                    } catch(e) {
+                        console.error(e);
+                    }
+                    renderFeed();
                 });
             } else {
                 logDebug("연결 실패: messagesRef가 정의되지 않았습니다.", true);
