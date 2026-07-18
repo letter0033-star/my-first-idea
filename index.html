@@ -85,17 +85,6 @@
         </button>
     </footer>
 
-    <!-- Debug Console Log Bar for Troubleshooting -->
-    <div id="debug-panel" style="position: fixed; bottom: 10px; left: 10px; z-index: 10000; background: rgba(30, 25, 22, 0.95); border: 1px solid rgba(255, 126, 71, 0.3); border-radius: 12px; padding: 12px; max-width: 90%; width: 350px; font-family: monospace; font-size: 11px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 126, 71, 0.2); padding-bottom: 6px; margin-bottom: 6px; font-weight: bold; color: #ff7e47;">
-            <span>🔧 실시간 DB 디버그 패널</span>
-            <button onclick="document.getElementById('debug-logs').style.display = document.getElementById('debug-logs').style.display === 'none' ? 'block' : 'none'" style="background: none; border: none; color: #ff7e47; cursor: pointer; font-size: 11px; padding: 0 4px;">접기/펴기</button>
-        </div>
-        <div id="debug-logs" style="max-height: 120px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4;">
-            프로젝트 연결 시도 중...<br>
-        </div>
-    </div>
-
     <!-- Interactive Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -576,12 +565,10 @@
 
         // Debug logger helper
         function logDebug(msg, isError = false) {
-            console.log(msg);
-            const logsDiv = document.getElementById('debug-logs');
-            if (logsDiv) {
-                const color = isError ? '#ff4d4d' : '#00ffcc';
-                logsDiv.innerHTML += `<span style="color: ${color};">[${new Date().toLocaleTimeString()}]</span> ${msg}<br>`;
-                logsDiv.scrollTop = logsDiv.scrollHeight;
+            if (isError) {
+                console.error(msg);
+            } else {
+                console.log(msg);
             }
         }
 
