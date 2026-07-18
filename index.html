@@ -248,6 +248,21 @@
         ];
 
         let lastIndex = 0; // Starts with "오늘도 힘내세요!" (index 0)
+        let shuffledIndices = [];
+
+        function fillShuffledIndices() {
+            const indices = Array.from({ length: sentences.length }, (_, i) => i);
+            // Fisher-Yates Shuffle
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            // Avoid duplicate across shuffle boundary (the next popped element is at indices.length - 1)
+            if (indices[indices.length - 1] === lastIndex && indices.length > 1) {
+                [indices[indices.length - 1], indices[0]] = [indices[0], indices[indices.length - 1]];
+            }
+            shuffledIndices = indices;
+        }
 
         const buttonGradients = [
             { base: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)", hover: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)" }, // Blue
@@ -309,11 +324,10 @@
             heading.classList.add('fade-out');
             
             setTimeout(() => {
-                let nextIndex;
-                do {
-                    nextIndex = Math.floor(Math.random() * sentences.length);
-                } while (nextIndex === lastIndex);
-                
+                if (shuffledIndices.length === 0) {
+                    fillShuffledIndices();
+                }
+                const nextIndex = shuffledIndices.pop();
                 lastIndex = nextIndex;
                 heading.textContent = sentences[nextIndex];
                 heading.classList.remove('fade-out');
