@@ -728,12 +728,19 @@
                 return;
             }
             
-            // Determine avatar based on role
+            // Determine avatar randomly from the 8 age/gender options
+            const avatarList = [
+                'avatar_20m.png',
+                'avatar_20f.png',
+                'avatar_30m.png',
+                'avatar_30f.png',
+                'avatar_40m.png',
+                'avatar_40f.png',
+                'avatar_50m.png',
+                'avatar_50f.png'
+            ];
+            const avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
             const role = roleSelect.value;
-            let avatar = 'avatar2.png'; // default
-            if (['teacher', 'vicemaster', 'master'].includes(role)) {
-                avatar = 'avatar1.png';
-            }
             
             // Create role display name
             const roleLabels = {
