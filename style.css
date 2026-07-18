@@ -357,6 +357,52 @@ body {
         padding: 24px 20px 10px 20px;
         text-align: center;
     }
+    
+    /* 1. Stack write inputs vertically to prevent horizontal overflow */
+    .write-inputs {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .write-inputs input {
+        width: 100% !important;
+    }
+    
+    .write-inputs select, #writer-avatar {
+        width: 100% !important;
+    }
+    
+    /* 2. Adjust main content padding to prevent overflow */
+    .main-content {
+        padding: 15px 16px !important;
+        gap: 24px;
+    }
+    
+    /* 3. Decrease card padding and remove backdrop-filter to fix rendering / scroll bugs */
+    .card {
+        padding: 35px 20px !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05) !important;
+    }
+    
+    /* Remove backdrop-filter from write-box as well to prevent the same WebKit render bug */
+    .write-box {
+        padding: 20px 16px !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Optimize font sizes for card h1 on mobile and isolate layers */
+    .card h1 {
+        font-size: 1.6rem !important;
+        line-height: 1.5 !important;
+        will-change: transform, opacity !important;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
+    }
 }
 
 /* Sections & Community Feed Styles */
@@ -542,16 +588,7 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Mobile Adjustments for Write Box */
-@media (max-width: 480px) {
-    .write-inputs {
-        flex-direction: column;
-        gap: 8px;
-    }
-    .write-inputs select {
-        width: 100%;
-    }
-}
+
 
 /* Delete Message Button Styles */
 .delete-msg-btn {
