@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <!-- Ambient Background Glows -->
@@ -64,22 +64,75 @@
             createParticles(event.clientX, event.clientY);
         }
 
+        const sentences = [
+            "오늘도 힘내세요!",
+            "오늘도 충분히 잘하고 있어.",
+            "오늘도 누군가에게 좋은 영향을 주고 있다.",
+            "힘든 날도 지나간다. 좋은 날도 반드시 온다.",
+            "혼자가 아니다. 함께 응원하는 사람들이 있다.",
+            "동료들도 당신의 노력을 알고 있다.",
+            "당신을 믿는 사람이 생각보다 많다.",
+            "누군가는 오늘도 당신 덕분에 웃고 있다.",
+            "당신의 따뜻한 마음은 많은 사람에게 전해지고 있다.",
+            "오늘 하루도 사랑하는 사람들을 위해 최선을 다했다.",
+            "지금까지 버텨온 당신이 가장 대단하다.",
+            "웃으며 시작하면 좋은 일이 따라온다.",
+            "오늘도 아이들에게 따뜻한 하루를 선물한 선생님, 정말 수고 많으셨습니다.",
+            "아이들에게 쏟은 사랑만큼 오늘은 스스로에게도 따뜻한 휴식을 선물하세요.",
+            "오늘 힘들었다는 것은 그만큼 아이들에게 진심을 다했다는 증거입니다.",
+            "아이들의 웃음 뒤에는 언제나 선생님의 수고가 있었습니다. 오늘도 감사합니다.",
+            "오늘 해결하지 못한 일은 내일 다시 시작하면 됩니다. 선생님은 이미 충분히 잘하고 있습니다.",
+            "오늘도 아이들의 곁을 지켜주신 선생님, 당신은 누군가의 평생 기억에 남을 좋은 선생님입니다.",
+            "한 아이의 성장에는 많은 시간이 필요합니다. 오늘의 작은 관심과 한마디는 언젠가 큰 힘이 됩니다.",
+            "오늘의 노력이 내일의 아름다운 열매가 될 것입니다.",
+            "당신이 걷고 있는 그 길은 결코 헛되지 않습니다.",
+            "힘들 때 쉬어가는 것도 더 멀리 가기 위한 지혜입니다."
+        ];
+
+        let lastIndex = 0; // Starts with "오늘도 힘내세요!" (index 0)
+
+        // Test mode auto-activation (for verification screenshots)
+        if (window.location.search.includes('test=true')) {
+            window.addEventListener('DOMContentLoaded', () => {
+                const heading = document.getElementById('main-heading');
+                // Use a long teacher-themed sentence to verify formatting and alignment
+                heading.textContent = sentences[12];
+            });
+        }
+
         function triggerCheer(event) {
             event.stopPropagation(); // Prevent event bubbling to card
             
             const btn = document.getElementById('cheer-btn');
+            const heading = document.getElementById('main-heading');
+            
+            // Button bounce effect
             btn.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 btn.style.transform = '';
             }, 100);
             
+            // Position for particle bursts
             const rect = btn.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
             
-            // Double burst for extra celebratory effect
             createParticles(x, y);
             setTimeout(() => createParticles(x, y), 80);
+
+            // Change sentence with a smooth fade transition
+            heading.classList.add('fade-out');
+            
+            setTimeout(() => {
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * sentences.length);
+                } while (nextIndex === lastIndex);
+                
+                lastIndex = nextIndex;
+                heading.textContent = sentences[nextIndex];
+                heading.classList.remove('fade-out');
+            }, 200);
         }
 
         function createParticles(x, y) {

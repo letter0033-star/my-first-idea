@@ -120,6 +120,8 @@ main {
     font-size: clamp(2.4rem, 5.6vw, 4.4rem);
     font-weight: 900;
     letter-spacing: -0.05em;
+    line-height: 1.35;
+    word-break: keep-all;
     background: var(--accent-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -127,6 +129,12 @@ main {
     margin-bottom: 16px;
     position: relative;
     display: inline-block;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card h1.fade-out {
+    opacity: 0;
+    transform: scale(0.96) translateY(-5px);
 }
 
 .card p {
