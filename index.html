@@ -98,14 +98,13 @@
             storageBucket: "my-first-idea-23d72.firebasestorage.app",
             messagingSenderId: "759970102715",
             appId: "1:759970102715:web:b7b507c9668660448e989e",
-            measurementId: "G-WSJJ3V5TN1",
-            databaseURL: "https://my-first-idea-23d72-default-rtdb.firebaseio.com" // Default RTDB URL
+            measurementId: "G-WSJJ3V5TN1"
         };
 
-        // Initialize Firebase
+        // Initialize Firebase App
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const messagesRef = ref(db, 'messages');
+        let db;
+        let messagesRef;
 
         function createRipple(event) {
             const card = document.getElementById('idea-card');
@@ -542,20 +541,72 @@
             {
                 username: '열정 가득한 교감선생님',
                 avatar: 'avatar2.png',
-                time: '5분 전',
+                timestamp: Date.now() - 3600000 * 5, // 5 hours ago
                 message: '보이지 않는 곳에서도 온 마음을 다해 하루를 지켜내시는 모든 교육 가족분들, 지치는 순간 속에서도 웃음을 잃지 않고 헌신하시는 여러분의 매 순간이 곧 기적입니다. 오늘 하루도 고생 많으셨습니다!'
             }
         ];
 
-        // Load community messages from localStorage or use defaults
-        let customMessages = [];
-        try {
-            const saved = localStorage.getItem('cheer_community_messages');
-            if (saved) {
-                customMessages = JSON.parse(saved);
+        // Format relative time helper
+        function formatRelativeTime(timestamp) {
+            if (!timestamp) return '방금 전';
+            const diff = Date.now() - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (minutes < 1) return '방금 전';
+            if (minutes < 60) return `${minutes}분 전`;
+            if (hours < 24) return `${hours}시간 전`;
+            return `${days}일 전`;
+        }
+
+        // Live messages from Firebase
+        let firebaseMessages = [];
+
+        // Dynamic Firebase Realtime Database auto-probing
+        async function initFirebaseDb() {
+            // Import SDK function dynamically
+            const { getDatabase, ref, push, onValue } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
+            
+            const usUrl = "https://my-first-idea-23d72-default-rtdb.firebaseio.com";
+            const sgUrl = "https://my-first-idea-23d72-default-rtdb.asia-southeast1.firebasedatabase.app";
+            
+            let selectedUrl = usUrl;
+            
+            try {
+                // Probe Singapore database URL (shallow check)
+                const res = await fetch(sgUrl + "/.json?shallow=true", { method: 'GET' });
+                // If the fetch completes successfully (even if it returns 401/403/200), the URL is active!
+                selectedUrl = sgUrl;
+                console.log("Auto-detected Singapore database region!");
+            } catch(e) {
+                console.log("Singapore region probe failed, fallback to US database URL.");
             }
-        } catch (e) {
-            console.error("Failed to load local storage messages: ", e);
+            
+            try {
+                db = getDatabase(app, selectedUrl);
+                messagesRef = ref(db, 'messages');
+                
+                // Real-time synchronization
+                onValue(messagesRef, (snapshot) => {
+                    const data = snapshot.val();
+                    const loaded = [];
+                    if (data) {
+                        Object.keys(data).forEach(key => {
+                            loaded.push(data[key]);
+                        });
+                        // Sort by timestamp descending (newest first)
+                        loaded.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    }
+                    firebaseMessages = loaded;
+                    renderFeed();
+                }, (error) => {
+                    console.error("Firebase Database read failed: ", error);
+                    showToast('데이터베이스 권한 규칙(Rules)을 확인해 주세요.');
+                });
+            } catch (err) {
+                console.error("Firebase DB init failed: ", err);
+            }
         }
 
         // Render feed function
@@ -565,22 +616,22 @@
             
             feedContainer.innerHTML = '';
             
-            // Render user saved custom messages first, then defaults
-            const allMessages = [...customMessages, ...defaultMessages];
+            // Merge custom firebase messages with default messages
+            const allMessages = [...firebaseMessages, ...defaultMessages];
             
             allMessages.forEach(item => {
                 const feedItem = document.createElement('div');
                 feedItem.classList.add('feed-item');
-                
-                // Add fade-in entry animation for new items
                 feedItem.style.animation = 'fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                
+                const timeText = formatRelativeTime(item.timestamp);
                 
                 feedItem.innerHTML = `
                     <img src="${item.avatar}" alt="${item.username}" class="feed-avatar">
                     <div class="feed-content">
                         <div class="feed-header">
                             <span class="feed-username">${item.username}</span>
-                            <span class="feed-time">${item.time}</span>
+                            <span class="feed-time">${timeText}</span>
                         </div>
                         <p class="feed-message">${item.message}</p>
                     </div>
@@ -590,7 +641,7 @@
         }
 
         // Save new message function
-        function saveMessage(event) {
+        async function saveMessage(event) {
             event.preventDefault();
             event.stopPropagation();
             
@@ -637,39 +688,45 @@
             const newMessage = {
                 username: displayName,
                 avatar: avatar,
-                time: '방금 전',
+                timestamp: Date.now(),
                 message: message
             };
             
-            // Insert at the beginning of custom messages
-            customMessages.unshift(newMessage);
-            
-            // Save to localStorage
-            try {
-                localStorage.setItem('cheer_community_messages', JSON.stringify(customMessages));
-            } catch (e) {
-                console.error("Failed to save message to localStorage: ", e);
+            if (messagesRef) {
+                const { push } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
+                push(messagesRef, newMessage)
+                    .then(() => {
+                        // Clear inputs
+                        messageInput.value = '';
+                        nameInput.value = '';
+                        
+                        // Show success toast
+                        showToast('따뜻한 응원이 등록되었습니다!');
+                        
+                        // Add subtle particle effect around the save button
+                        const rect = event.target.getBoundingClientRect();
+                        createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    })
+                    .catch((err) => {
+                        console.error("Firebase push failed: ", err);
+                        showToast('등록에 실패했습니다. DB 규칙(Rules)을 확인해 주세요.');
+                    });
+            } else {
+                showToast('데이터베이스에 연결하는 중입니다. 잠시 후 다시 시도해 주세요.');
             }
-            
-            // Clear inputs
-            messageInput.value = '';
-            nameInput.value = '';
-            
-            // Rerender feed
-            renderFeed();
-            
-            // Show success toast
-            showToast('따뜻한 응원이 저장되었습니다!');
-            
-            // Add subtle particle effect around the save button
-            const rect = event.target.getBoundingClientRect();
-            createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
         }
 
-        // Initialize feed on page load
+        // Initialize feed and database on page load
         window.addEventListener('DOMContentLoaded', () => {
             renderFeed();
+            initFirebaseDb();
         });
+
+        // Expose functions globally for inline HTML event handlers
+        window.createRipple = createRipple;
+        window.triggerCheer = triggerCheer;
+        window.saveMessage = saveMessage;
+        window.shareLink = shareLink;
     </script>
 </body>
 </html>
