@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
     <!-- Ambient Background Glows -->
@@ -91,12 +91,28 @@
 
         let lastIndex = 0; // Starts with "오늘도 힘내세요!" (index 0)
 
+        const buttonGradients = [
+            { base: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)", hover: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)" }, // Blue
+            { base: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)", hover: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)" }, // Teal
+            { base: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)", hover: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)" }, // Indigo
+            { base: "linear-gradient(135deg, #db2777 0%, #9d174d 100%)", hover: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)" }, // Pink
+            { base: "linear-gradient(135deg, #0284c7 0%, #075985 100%)", hover: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)" }, // Sky
+            { base: "linear-gradient(135deg, #ea580c 0%, #9a3412 100%)", hover: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)" }, // Orange
+            { base: "linear-gradient(135deg, #16a34a 0%, #166534 100%)", hover: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }  // Green
+        ];
+        let lastColorIndex = 0;
+
         // Test mode auto-activation (for verification screenshots)
         if (window.location.search.includes('test=true')) {
             window.addEventListener('DOMContentLoaded', () => {
                 const heading = document.getElementById('main-heading');
                 // Use a long teacher-themed sentence to verify formatting and alignment
                 heading.textContent = sentences[12];
+                
+                // Force select Teal (index 1) in test mode to verify button color updates properly
+                const btn = document.getElementById('cheer-btn');
+                btn.style.setProperty('--btn-gradient', buttonGradients[1].base);
+                btn.style.setProperty('--btn-gradient-hover', buttonGradients[1].hover);
             });
         }
 
@@ -119,6 +135,17 @@
             
             createParticles(x, y);
             setTimeout(() => createParticles(x, y), 80);
+
+            // Change button color
+            let nextColorIndex;
+            do {
+                nextColorIndex = Math.floor(Math.random() * buttonGradients.length);
+            } while (nextColorIndex === lastColorIndex);
+            
+            lastColorIndex = nextColorIndex;
+            const nextColors = buttonGradients[nextColorIndex];
+            btn.style.setProperty('--btn-gradient', nextColors.base);
+            btn.style.setProperty('--btn-gradient-hover', nextColors.hover);
 
             // Change sentence with a smooth fade transition
             heading.classList.add('fade-out');
