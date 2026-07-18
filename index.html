@@ -60,6 +60,39 @@
                         <option value="citizen">응원하는 시민</option>
                     </select>
                 </div>
+                
+                <!-- Character Avatar Selector -->
+                <div class="avatar-selector-container">
+                    <label class="avatar-selector-label">나를 표현할 캐릭터 선택</label>
+                    <div class="avatar-selector-grid">
+                        <div class="avatar-option active" onclick="selectAvatarOption(this, 'avatar_20m.png')">
+                            <img src="avatar_20m.png" alt="20대 남성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_20f.png')">
+                            <img src="avatar_20f.png" alt="20대 여성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_30m.png')">
+                            <img src="avatar_30m.png" alt="30대 남성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_30f.png')">
+                            <img src="avatar_30f.png" alt="30대 여성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_40m.png')">
+                            <img src="avatar_40m.png" alt="40대 남성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_40f.png')">
+                            <img src="avatar_40f.png" alt="40대 여성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_50m.png')">
+                            <img src="avatar_50m.png" alt="50대 남성">
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatarOption(this, 'avatar_50f.png')">
+                            <img src="avatar_50f.png" alt="50대 여성">
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected-avatar-input" value="avatar_20m.png">
+                </div>
+                
                 <textarea id="writer-message" placeholder="여기에 모두를 향한 응원의 한마디를 남겨주세요..." maxlength="150"></textarea>
                 <button class="save-btn" onclick="saveMessage(event)">응원 저장하기</button>
             </div>
@@ -728,18 +761,8 @@
                 return;
             }
             
-            // Determine avatar randomly from the 8 age/gender options
-            const avatarList = [
-                'avatar_20m.png',
-                'avatar_20f.png',
-                'avatar_30m.png',
-                'avatar_30f.png',
-                'avatar_40m.png',
-                'avatar_40f.png',
-                'avatar_50m.png',
-                'avatar_50f.png'
-            ];
-            const avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
+            // Get selected avatar from selector input
+            const avatar = document.getElementById('selected-avatar-input').value;
             const role = roleSelect.value;
             
             // Create role display name
@@ -838,6 +861,22 @@
             }
         }
 
+        // Select avatar option function
+        function selectAvatarOption(element, filename) {
+            // Play click sound
+            playClickSound();
+            
+            // Remove active class from all options
+            const options = document.querySelectorAll('.avatar-option');
+            options.forEach(opt => opt.classList.remove('active'));
+            
+            // Add active class to clicked option
+            element.classList.add('active');
+            
+            // Update hidden input value
+            document.getElementById('selected-avatar-input').value = filename;
+        }
+
         // Initialize feed and database on page load
         window.addEventListener('DOMContentLoaded', () => {
             renderFeed();
@@ -849,6 +888,7 @@
         window.triggerCheer = triggerCheer;
         window.saveMessage = saveMessage;
         window.deleteMessage = deleteMessage;
+        window.selectAvatarOption = selectAvatarOption;
         window.shareLink = shareLink;
     </script>
 </body>
