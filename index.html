@@ -50,9 +50,6 @@
                         <option value="teacher">선생님</option>
                         <option value="vicemaster">교감선생님</option>
                         <option value="master">교장선생님</option>
-                        <option value="parent">학부모</option>
-                        <option value="student">학생</option>
-                        <option value="citizen">응원하는 시민</option>
                     </select>
                     <select id="writer-avatar" onchange="playClickSound()">
                         <option value="avatar_20m.png">👦 20대 남성 캐릭터</option>
@@ -537,20 +534,7 @@
         }
 
         // List of default/static community messages with simulated timestamps
-        const defaultMessages = [
-            {
-                username: '인자한 교장선생님',
-                avatar: 'avatar1.png',
-                timestamp: Date.now() - 3600000 * 2, // 2 hours ago
-                message: '각자의 자리에서 묵묵히 교육의 참뜻을 실천하고 계시는 우리 선생님들과 모든 교직원 여러분, 당신들의 선한 헌신이 있기에 우리 아이들과 세상이 더욱 따뜻하게 빛납니다. 진심으로 감사하고 응원합니다.'
-            },
-            {
-                username: '열정 가득한 교감선생님',
-                avatar: 'avatar2.png',
-                timestamp: Date.now() - 3600000 * 5, // 5 hours ago
-                message: '보이지 않는 곳에서도 온 마음을 다해 하루를 지켜내시는 모든 교육 가족분들, 지치는 순간 속에서도 웃음을 잃지 않고 헌신하시는 여러분의 매 순간이 곧 기적입니다. 오늘 하루도 고생 많으셨습니다!'
-            }
-        ];
+        const defaultMessages = [];
 
         // Format relative time helper
         function formatRelativeTime(timestamp) {
